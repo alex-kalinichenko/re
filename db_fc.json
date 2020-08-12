@@ -1,0 +1,28 @@
+{well_1:
+	params:{
+		field: 'field_1',
+		spud_date: 01.01.2000,
+	}
+	forecasts:{
+		1:{
+			fc_name: 'BP 2021 agreed with partner',
+			description: 'This fc wad done for business planning',
+			date: 25.05.2020,
+			params:{
+				date: 01.01.2021
+				oil: 1000,
+				water: 500,
+				wct: 30,
+			}
+		2: {
+			fc_name: 'BP 2022 agreed with partner',
+			description: 'This fc wad done for business planning',
+			date: 27.05.2020,
+			params:{
+				date: 01.01.2022.
+				oil: 500,
+				water: 1000,
+				wct: 80,
+		}
+	}
+}
