@@ -4,6 +4,7 @@ import win32com.client
 import sys
 import os
 import time
+from datetime import datetime
 import pandas as pd
 
 class OpenServer():
@@ -116,8 +117,11 @@ try:
     
     # Perform functions
     cwd = os.getcwd() # current working directory
-    #file_name = '9204 choke asep 2020.12.10 62tubing.Out'
-    OSOpenFile(petex, cwd + r'\PROSPER\9205 choke sep 2020.12.09 73tubing.Out', 'PROSPER')
+
+    # Имя файа с которым работаем
+    file_name = '\PROSPER\9205 choke sep 2020.12.09 73tubing.Out'
+    OSOpenFile(petex, cwd + file_name, 'PROSPER')
+    #OSOpenFile(petex, cwd + r'\PROSPER\9205 choke sep 2020.12.09 73tubing.Out', 'PROSPER')
     #DoCmd(petex, 'PROSPER.ANL.SYS.CALC')
 
     # коэф. перевода кгс/см2 в BARa
@@ -171,21 +175,22 @@ try:
                        round(float(sol_node_pres), 1)]
         i += 1
 
-    # печать всех колонок датафрейма
+    # печать всех колонок датафрейма на экран
     pd.options.display.max_columns = None
     print(data)
+
     print(f'Дебит нефти пересчитан ({density_units} => т/сут) через плотность\
 = {round(float(density), 0)} {density_units}')
 
-    #writer = pd.ExcelWriter('prosper_output.xlsx')
-    #data.to_excel(writer, sheet_name='well name')
-    #writer.save()
-
     # пишем данные в файл
     try:
-        data.to_csv('prosper_output.csv', index=False, sep=' ')
+        writer = pd.ExcelWriter('prosper_output.xlsx')
+        data.to_excel(writer,
+                      sheet_name=f'{datetime.now().strftime("%Y-%m-%d %H-%M-%S")}',
+                      index=False)
+        writer.save()
         print('ГОТОВО: данные записаны в файл')
-        
+       
     except PermissionError:
         print('                ==============================\n  \
                ########    ОШИБКА   #########\n \
