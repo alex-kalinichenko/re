@@ -1,4 +1,5 @@
-﻿# скрипт для извлечения данных из Prosper через OpenServer
+﻿# скрипт для экспорта данных из Prosper через OpenServer в Excel
+
 # Import modules for OpenServer functions
 import win32com.client
 import sys
@@ -119,13 +120,15 @@ try:
     cwd = os.getcwd() # current working directory
 
     # Имя файа с которым работаем
-    file_name = '\PROSPER\9205 choke sep 2020.12.09 73tubing.Out'
+    file_name = r'\PROSPER\20210112_9213_73tubing.Out'
     OSOpenFile(petex, cwd + file_name, 'PROSPER')
     #OSOpenFile(petex, cwd + r'\PROSPER\9205 choke sep 2020.12.09 73tubing.Out', 'PROSPER')
     #DoCmd(petex, 'PROSPER.ANL.SYS.CALC')
 
     # коэф. перевода кгс/см2 в BARa
-    rgs_cm2_to_bara = 0.98062
+    kgs_cm2_to_bara = 0.98062
+
+    print('========>  Prosper файл ПЕРЕКЛЮЧЕН в BARa? <=========')
     
     # извлекаем плотность и ед.измерения
     density = DoGet(petex, f'PROSPER.PVT.Input.Api')
@@ -133,16 +136,19 @@ try:
     liq_units = DoGet(petex, f'PROSPER.OUT.SYS.Results[0].Sol.LiqRate.UNITNAME')
     thp_units = DoGet(petex, f'PROSPER.OUT.SYS.Results[0].Sol.WHPressure.UNITNAME')
     bhp_units = DoGet(petex, f'PROSPER.OUT.SYS.Results[0].Sol.BHP.UNITNAME')
-    choke_inuts = DoGet(petex, f'PROSPER.ANL.SYS.Sens.SensDB.Sens[146].Vals[0].UNITNAME')
+    choke_units = DoGet(petex, f'PROSPER.ANL.SYS.Sens.SensDB.Sens[146].Vals[0].UNITNAME')
 
     # создаём pandas датафрейм
-    data = pd.DataFrame({f'choke: {choke_inuts}': [],
+    # двойной пробел в THP, BHP чтобы различались названия колонок в случает
+    # совпадения ед.измерения (в этом случае ValueError: cannot set a row with mismatched columns)
+    data = pd.DataFrame({f'choke: {choke_units}': [],
                          f'liq rate: {liq_units}': [],
                          f'oil rate: t/d': [],
-                         f'THP: BARa':[],
-                         f'BHP: BARa': [],
-                         f'THP: {thp_units}':[],
-                         f'BHP: {bhp_units}': []})
+                         f'THP:  {thp_units}':[],
+                         f'BHP:  {bhp_units}': [],
+                         f'THP: kgs/cm2':[],
+                         f'BHP: kgs/cm2': []})
+    
     i = 0
     choke = 0.1 # объявляем переменную
 
@@ -164,15 +170,15 @@ try:
         except BaseException:
             print(f'Количество штуцеров в расчёте: {i}')
             break # прерываем если штуцеры закончились
-        
+
         # добавляем в датафрейм: choke, liq rate, oil rate, THP, BHP
         data.loc[i] = [round(choke, 1),
-                       round(float(liq_rate), 1),
-                       round(float(oil_rate) * float(density) / 1000, 1),
-                       round(float(well_head_pres) * rgs_cm2_to_bara, 1),
-                       round(float(sol_node_pres) * rgs_cm2_to_bara, 1),
-                       round(float(well_head_pres), 1),
-                       round(float(sol_node_pres), 1)]
+                       round(float(liq_rate), 1), 
+                       round(float(oil_rate) * float(density) / 1000, 1), 
+                       round(float(well_head_pres), 1), 
+                       round(float(sol_node_pres), 1), 
+                       round(float(well_head_pres) / kgs_cm2_to_bara, 1), 
+                       round(float(sol_node_pres) / kgs_cm2_to_bara, 1)]
         i += 1
 
     # печать всех колонок датафрейма на экран
@@ -184,7 +190,7 @@ try:
 
     # пишем данные в файл
     try:
-        writer = pd.ExcelWriter('prosper_output.xlsx')
+        writer = pd.ExcelWriter('prosper_to_excel_output.xlsx')
         data.to_excel(writer,
                       sheet_name=f'{datetime.now().strftime("%Y-%m-%d %H-%M-%S")}',
                       index=False)
