@@ -1,5 +1,5 @@
 ﻿# скрипт для извлечения данных из Prosper через OpenServer
-# Import modules for OpenServer functions
+
 import win32com.client
 import sys
 import os
@@ -113,7 +113,7 @@ def OSSaveFile(OpenServe, theModel, appname):
         sys.exit("OSSaveFile: " + err)
 
 
-# функция возвращает список дат прогноза
+# get data list
 def get_date_list(n_dates):
     date_list = []
     for i in range(n_dates):
@@ -122,7 +122,7 @@ def get_date_list(n_dates):
     return date_list
         
     
-# функция возвращает лист оборудования
+# get equipment list
 def get_equip_list(equip_type):
     if equip_type == 'WELL':
         equip = DoGet(petex, f"GAP.MOD[0].{equip_type}[$].Label").split('|')
@@ -135,11 +135,10 @@ def get_equip_list(equip_type):
 
     equip = [elem for elem in equip if elem != '']
 
-    # сортируем по порядку
     return sorted(equip)
 
 
-# извлечение параметров работы оборудование и возврат в виде датафрейма
+# get parameters of equipment as DataFrame
 def get_param(equip_list, equip_type, param_name):
     '''
     GAP param_name:
