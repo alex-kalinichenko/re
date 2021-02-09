@@ -1,6 +1,5 @@
 ﻿# скрипт для экспорта данных из Prosper через OpenServer в Excel
 
-# Import modules for OpenServer functions
 import win32com.client
 import sys
 import os
@@ -25,7 +24,7 @@ class OpenServer():
         print("OpenServer disconnected")
 
 def GetAppName(sv):
-    # function for returning app name from tag string
+    # возвращает имя приложения из строки
     pos = sv.find(".")
     if pos < 2:
         sys.exit("GetAppName: Badly formed tag string")
@@ -35,7 +34,7 @@ def GetAppName(sv):
     return app_name
 
 def DoCmd(OpenServe, cmd):
-    # perform a command and check for errors
+    # производит команду и проверяет на ошибки
     lerr = OpenServe.OSReference.DoCommand(cmd)
     if lerr > 0:
         err = OpenServe.OSReference.GetErrorDescription(lerr)
@@ -43,7 +42,7 @@ def DoCmd(OpenServe, cmd):
         sys.exit("DoCmd: " + err)
 
 def DoSet(OpenServe, sv, val):
-    # set a value and check for errors
+    # устанавливает значение и проверяет на ошибки
     lerr = OpenServe.OSReference.SetValue(sv, val)
     app_name = GetAppName(sv)
     lerr = OpenServe.OSReference.GetLastError(app_name)
@@ -53,7 +52,7 @@ def DoSet(OpenServe, sv, val):
         sys.exit("DoSet: " + err)
 
 def DoGet(OpenServe, gv):
-    # get a value and check for errors
+    # получает значение и проверяет на ошибки
     get_value = OpenServe.OSReference.GetValue(gv)
     app_name = GetAppName(gv)
     lerr = OpenServe.OSReference.GetLastError(app_name)
@@ -64,7 +63,7 @@ def DoGet(OpenServe, gv):
     return get_value
 
 def DoSlowCmd(OpenServe, cmd):
-    # perform a command then wait for command to exit and check for errors
+    # производит команду затем ждёт команды выхода и проверяет на ошибки
     step = 0.001
     app_name = GetAppName(cmd)
     lerr = OpenServe.OSReference.DoCommandAsync(cmd)
@@ -108,7 +107,7 @@ def OSSaveFile(OpenServe, theModel, appname):
         OpenServe.Disconnect()
         sys.exit("OSSaveFile: " + err)
 
-# Script wrapped in a try statement to ensure license is disconnected in case of error
+# Скрипт обёрнут в исключение try для отключения от лицензии в случае ошибки
 try:
     # Initialises an 'OpenServer' class
     petex = OpenServer()
@@ -205,5 +204,5 @@ try:
                ===============================')
 
 finally:
-    # Required to close the license otherwise remains checked out
+    # требуется отключиться от лицензии иначе она удерживается
     petex.Disconnect()
