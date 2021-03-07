@@ -246,6 +246,8 @@ try:
                         'MixtureVelocity','ErosionalVelocity','AVGGASRATE'] # 'OPFREQ'
     # для Joint
     param_list_joint = ['OILRATE','GASRATE','WATRATE','LIQRATE','PRES','WCT']
+    # лимиты для кустов (JOINT)
+    joint_limits = ['MaxPressure']
     # для SINK (УКПГ/УПН)
     param_list_sink = ['OILRATE', 'GASRATE', 'WATRATE', 'LIQRATE', 'PRES', 'NUMACTIVEWELLS']
     # для PIPE

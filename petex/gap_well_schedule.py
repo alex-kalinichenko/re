@@ -154,7 +154,7 @@ try:
 
         # устнавливаем для скважины дату старта скважины в первую [0] строку schedule
         DoSet(petex, 'GAP.MOD[{PROD}].WELL[{' + f'{well}' + '}].SCHEDULE[0].Time', start_date_num)
-
+        DoSet(petex, 'GAP.MOD[{PROD}].WELL[{' + f'{well}' + '}].SCHEDULE[0].Type', 'WELL_ON')                                                                                     
     print('\n Готово! \n График бурения записан в GAP \n')
 
 
